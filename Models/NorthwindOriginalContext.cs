@@ -23,6 +23,7 @@ namespace NorthwindRestApi.Models
         public virtual DbSet<Customer> Customers { get; set; } = null!;
         public virtual DbSet<CustomerAndSuppliersByCity> CustomerAndSuppliersByCities { get; set; } = null!;
         public virtual DbSet<CustomerDemographic> CustomerDemographics { get; set; } = null!;
+        public virtual DbSet<Documentation> Documentations { get; set; } = null!;
         public virtual DbSet<Employee> Employees { get; set; } = null!;
         public virtual DbSet<EmployeesBak> EmployeesBaks { get; set; } = null!;
         public virtual DbSet<Invoice> Invoices { get; set; } = null!;
@@ -51,8 +52,8 @@ namespace NorthwindRestApi.Models
         {
             if (!optionsBuilder.IsConfigured)
             {
-#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-                optionsBuilder.UseSqlServer("Server=DESKTOP-83U5M2G\\SQLEXPRESS;Database=NorthwindOriginal;Trusted_Connection=True;");
+
+                return;
             }
         }
 
@@ -201,6 +202,15 @@ namespace NorthwindRestApi.Models
                     .IsFixedLength();
 
                 entity.Property(e => e.CustomerDesc).HasColumnType("ntext");
+            });
+
+            modelBuilder.Entity<Documentation>(entity =>
+            {
+                entity.ToTable("Documentation");
+
+                entity.Property(e => e.DocumentationId).HasColumnName("DocumentationID");
+
+                entity.Property(e => e.Method).HasMaxLength(20);
             });
 
             modelBuilder.Entity<Employee>(entity =>
