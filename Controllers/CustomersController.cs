@@ -12,7 +12,7 @@ namespace NorthwindRestApi.Controllers
         //NorthwindOriginalContext db = new NorthwindOriginalContext();
 
         // Dependency injektion tapa
-        private NorthwindOriginalContext db;
+        private readonly NorthwindOriginalContext db;
 
         public CustomersController(NorthwindOriginalContext dbparametri)
         {
@@ -36,7 +36,8 @@ namespace NorthwindRestApi.Controllers
 
         }
 
-        //Hakee asiakkaan pääavaimella
+        //Hakee asiakkaan pääavaimella.Tässä tapauksessa string id,
+        //koska Northwind tietokannassa asiakkaan pääavain on merkkijono
         //e virheenkäsittelyssä Exeption e = e on oma luotu muuttuja
         [HttpGet("{id}")]
         public ActionResult GetOneCustomerById(string id)
@@ -124,22 +125,26 @@ namespace NorthwindRestApi.Controllers
         }
 
         //Asiakkaan tietojen muokkaaminen
-
+        // ottaa vastaan kaksi parametria: id(string) ja asiakas
+        //From body tarkoittaa kaikkia asiakkaan tietoja
+        //Haetaan id:N perusteella vanha asiakasobjekti 
         [HttpPut("{id}")]
         public ActionResult EditCustomer(string id,[FromBody] Customer customer)
         {
              var asiakas = db.Customers.Find(id);
              if (asiakas != null)
              {
-                    asiakas.CompanyName = customer.CompanyName;
-                    asiakas.ContactName = customer.ContactName;
-                    asiakas.Address = customer.Address;
-                    asiakas.City = customer.City;
-                    asiakas.Region = customer.Region;
-                    asiakas.PostalCode = customer.PostalCode;
-                    asiakas.Country = customer.Country;
-                    asiakas.Phone = customer.Phone;
-                    asiakas.Fax = customer.Fax;
+                //em. asiakasobjektiin sulautetaann parametrina saadut asiakkaan tiedot
+                    asiakas = customer;
+                    //asiakas.CompanyName = customer.CompanyName;
+                    //asiakas.ContactName = customer.ContactName;
+                    //asiakas.Address = customer.Address;
+                    //asiakas.City = customer.City;
+                    //asiakas.Region = customer.Region;
+                    //asiakas.PostalCode = customer.PostalCode;
+                    //asiakas.Country = customer.Country;
+                    //asiakas.Phone = customer.Phone;
+                    //asiakas.Fax = customer.Fax;
                     db.SaveChanges();
                     return Ok($"Asiakkaan {asiakas.CompanyName} tiedot päivitetty");
 

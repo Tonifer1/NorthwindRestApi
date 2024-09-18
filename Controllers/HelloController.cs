@@ -15,6 +15,14 @@ namespace NorthwindRestApi.Controllers
 
         }
 
+        [HttpGet("json")]
+        public IActionResult GetJSON()
+        {
+            var response = new { Message = "Hello World!" };
+            return Ok(response); // Tämä palauttaa JSON-muodossa
+        }
+
+
         [HttpPost]
         public int LaskeYhteen(int a,int b)
         {
