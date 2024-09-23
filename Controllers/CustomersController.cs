@@ -20,7 +20,7 @@ namespace NorthwindRestApi.Controllers
         }
 
 
-        //Hakee kaikki asiakkaat
+        //GET = READ Hakee kaikki asiakkaat. Ei parametreja.
         [HttpGet]
         public ActionResult GetAllCustomers()
         {
@@ -42,29 +42,26 @@ namespace NorthwindRestApi.Controllers
         [HttpGet("{id}")]
         public ActionResult GetOneCustomerById(string id)
         {
-
-            var asiakas = db.Customers.Find(id);
-
-            if (asiakas == null)
+            try
             {
-                //return NotFound("Asiakasta id:ll" + id + "ei löytynyt");
-                return NotFound($"Asikasta id:llä  {id}  ei löytynyt");
+                // Yritetään hakea asiakas tietokannasta
+                var asiakas = db.Customers.Find(id);
+
+                // Tarkistetaan löytyykö asiakas
+                if (asiakas == null)
+                {
+                    return NotFound($"Asiakasta id:llä {id} ei löytynyt.");
+                }
+
+                // Jos asiakas löytyy, palautetaan se
+                return Ok(asiakas);
             }
-            return Ok(asiakas);
-            //try
-            //{
-            //    var asiakas = db.Customers.Find(id);
-            //  //var asiakas = db.Customers.Where(c=>c.CustomerID == id);
-            //    return Ok(asiakas);
-            //}
+            catch (Exception e)
+            {
+                // Jos tapahtuu virhe, palautetaan virheilmoitus
+                return BadRequest($"Tapahtui virhe haettaessa asiakasta id:llä {id}. Lisätietoja: {e.Message}");
+            }
 
-            //catch (Exception e)
-
-            //{
-            // return BadRequest("Asiakasta id:llä" + id "ei löydy");
-            // return BadRequest($"Asiakasta id:llä {id} ei löydy. Lue lisää: "+e.InnerException);//string interpolation
-            //}
-            //return BadRequest($"Tapahtui virhe. Lue lisää:  + {e.Message}");
 
         }
 
