@@ -52,8 +52,8 @@ namespace NorthwindRestApi.Models
         {
             if (!optionsBuilder.IsConfigured)
             {
-
                 return;
+                
             }
         }
 
