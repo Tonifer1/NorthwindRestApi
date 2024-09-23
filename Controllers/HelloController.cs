@@ -8,7 +8,7 @@ namespace NorthwindRestApi.Controllers
     //C# puhutaan yleensä metodeista, koska ne kuuluvat luokkiin.Esimerkiksi sekä GetJSON että LaskeYhteen ovat metodeja,
     //koska ne ovat osa HelloController-luokkaa.
 
-        //Haku tehdään /api/hello. Controller sana jää pois
+        //Haku tehdään /api/hello. Eli Controller sana jää pois
         [Route("api/[controller]")]
     [ApiController]
     public class HelloController : ControllerBase
