@@ -13,8 +13,10 @@ namespace NorthwindRestApi.Controllers
     [ApiController]
     public class ProductsController : ControllerBase
     {
+        //Dependency injektion tapa. Alustetaan tyhjänä _context.
         private readonly NorthwindOriginalContext _context;
 
+        //Metodi on nimetty Products Controllerin mukaan.
         public ProductsController(NorthwindOriginalContext context)
         {
             _context = context;
@@ -119,5 +121,28 @@ namespace NorthwindRestApi.Controllers
         {
             return (_context.Products?.Any(e => e.ProductId == id)).GetValueOrDefault();
         }
+
+        // Hakee nimen osalla tuotteen: /api/productname/hakusana
+        //GET = READ Hakee nimen osalla tuotteen.
+        [HttpGet("productname/{pname}")]
+        public ActionResult GetByName(string pname)
+        {
+            try
+            {
+                var prod = _context.Products.Where(p => p.ProductName.Contains(pname));
+
+                //var prod = from p in _context.Product where p.ProductName.Contains(pname) select p; //<-- sama mutta traditional
+
+
+                // var cust = _context.Customers.Where(c => c.CompanyName == cname);// <--- perfect match
+
+                return Ok(prod);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
     }
 }

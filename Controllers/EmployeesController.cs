@@ -13,8 +13,10 @@ namespace NorthwindRestApi.Controllers
     [ApiController]
     public class EmployeesController : ControllerBase
     {
+        //Dependency injektion tapa. Alustetaan tyhjänä _context.
         private readonly NorthwindOriginalContext _context;
 
+        //Metodi on nimetty Employees Controllerin mukaan
         public EmployeesController(NorthwindOriginalContext context)
         {
             _context = context;

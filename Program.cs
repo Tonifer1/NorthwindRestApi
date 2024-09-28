@@ -4,15 +4,19 @@ using NorthwindRestApi.Models;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-//Dependency injectionilla v‰litetty tietokantayhteys controllereille
-builder.Services.AddDbContext<NorthwindOriginalContext>(options =>
-options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-//Azureen julkaistessa k‰ytet‰‰n t‰t‰:
+
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+//Dependency injectionilla v‰litetty tietokantayhteys controllereille
+builder.Services.AddDbContext<NorthwindOriginalContext>(options =>
+options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+//Azureen julkaistessa k‰ytet‰‰n t‰t‰:
+
+
 
 // ------------- Cors m‰‰ritys ------------
 builder.Services.AddCors(options =>

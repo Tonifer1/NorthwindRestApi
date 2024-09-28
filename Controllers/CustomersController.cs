@@ -11,9 +11,10 @@ namespace NorthwindRestApi.Controllers
         //Alustetaan tietokantayhteys. Perinteinen tapa
         //NorthwindOriginalContext db = new NorthwindOriginalContext();
 
-        // Dependency injektion tapa
+        //Dependency injektion tapa. Alustetaan tyhjänä db.
         private readonly NorthwindOriginalContext db;
 
+        //Metodi on nimetty Controllerin mukaan. 
         public CustomersController(NorthwindOriginalContext dbparametri)
         {
             db = dbparametri;
@@ -39,6 +40,7 @@ namespace NorthwindRestApi.Controllers
         //Hakee asiakkaan pääavaimella.Tässä tapauksessa string id,
         //koska Northwind tietokannassa asiakkaan pääavain on merkkijono
         //e virheenkäsittelyssä Exeption e = e on oma luotu muuttuja
+        //GET = READ Hakee Id:n perusteella asiakkaan.
         [HttpGet("{id}")]
         public ActionResult GetOneCustomerById(string id)
         {
@@ -66,7 +68,7 @@ namespace NorthwindRestApi.Controllers
         }
 
         //Uuden asiakkaan lisääminen. customer on alias nimi
-
+        //POST = CREATE Lisää uuden asiakkaan. Ei parametreja.
         [HttpPost]
         public ActionResult AddNewCustomer([FromBody] Customer customer)
         {
@@ -77,6 +79,7 @@ namespace NorthwindRestApi.Controllers
         }
 
         //Poistaminen url parametrina annettavan  id:n perusteella. Huom! string muoto
+        //DELETE = DELETE Poistaa asiakkaan id:n perusteella. 
         [HttpDelete("{id}")]
         public ActionResult DeleteOneCustomerById(string id)
         {
@@ -99,7 +102,8 @@ namespace NorthwindRestApi.Controllers
             }
             catch (Exception e)
             {
-                return BadRequest("Tapahtui virhe. Lue lisää: " + e.InnerException);
+              //return BadRequest("Tapahtui virhe. Lue lisää: " + e.InnerException);
+                return BadRequest($"Tapahtui virhe. Lue lisää:  + {e.Message}");
             }
 
 
@@ -117,14 +121,16 @@ namespace NorthwindRestApi.Controllers
             // return BadRequest("Asiakasta id:llä" + id "ei löydy");
             // return BadRequest($"Asiakasta id:llä {id} ei löydy. Lue lisää: "+e.InnerException);//string interpolation
             //}
-            //return BadRequest($"Tapahtui virhe. Lue lisää:  + {e.Message}")
+
 
         }
 
         //Asiakkaan tietojen muokkaaminen
-        // ottaa vastaan kaksi parametria: id(string) ja asiakas
+        //ottaa vastaan kaksi parametria:Urlista id(string) ja customer objekti http bodyn osasta.
         //From body tarkoittaa kaikkia asiakkaan tietoja
-        //Haetaan id:N perusteella vanha asiakasobjekti 
+        //Haetaan id:N perusteella vanha asiakasobjekti
+        //PUT= UPDATE Päivittää asiakkaan tiedot id:n perusteella.
+        //Hakee asiakkaan pääavaimella.Tässä tapauksessa string id.
         [HttpPut("{id}")]
         public ActionResult EditCustomer(string id,[FromBody] Customer customer)
         {
@@ -132,16 +138,16 @@ namespace NorthwindRestApi.Controllers
              if (asiakas != null)
              {
                 //em. asiakasobjektiin sulautetaann parametrina saadut asiakkaan tiedot
-                    asiakas = customer;
-                    //asiakas.CompanyName = customer.CompanyName;
-                    //asiakas.ContactName = customer.ContactName;
-                    //asiakas.Address = customer.Address;
-                    //asiakas.City = customer.City;
-                    //asiakas.Region = customer.Region;
-                    //asiakas.PostalCode = customer.PostalCode;
-                    //asiakas.Country = customer.Country;
-                    //asiakas.Phone = customer.Phone;
-                    //asiakas.Fax = customer.Fax;
+                    asiakas.CompanyName = customer.CompanyName;
+                    asiakas.ContactName = customer.ContactName;
+                    asiakas.Address = customer.Address;
+                    asiakas.City = customer.City;
+                    asiakas.Region = customer.Region;
+                    asiakas.PostalCode = customer.PostalCode;
+                    asiakas.Country = customer.Country;
+                    asiakas.Phone = customer.Phone;
+                    asiakas.Fax = customer.Fax;
+                    db.Customers.Update(asiakas); // Päivitä muokattu asiakasobjekti
                     db.SaveChanges();
                     return Ok($"Asiakkaan {asiakas.CompanyName} tiedot päivitetty");
 
@@ -150,6 +156,7 @@ namespace NorthwindRestApi.Controllers
         }
 
         // Hakee nimen osalla: /api/companyname/hakusana
+        //GET = READ Hakee nimen osalla asiakkaan.
         [HttpGet("companyname/{cname}")]
         public ActionResult GetByName(string cname)
         {
