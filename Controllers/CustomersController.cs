@@ -162,9 +162,9 @@ namespace NorthwindRestApi.Controllers
         {
             try
             {
-                //var cust = db.Customers.Where(c => c.CompanyName.Contains(cname));
+                var cust = db.Customers.Where(c => c.CompanyName.Contains(cname));
 
-                var cust = from c in db.Customers where c.CompanyName.Contains(cname) select c; //<-- sama mutta traditional
+                //var cust = from c in db.Customers where c.CompanyName.Contains(cname) select c; //<-- sama mutta traditional
 
 
                 // var cust = db.Customers.Where(c => c.CompanyName == cname);// <--- perfect match

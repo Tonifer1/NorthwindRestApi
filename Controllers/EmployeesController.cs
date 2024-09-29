@@ -33,6 +33,21 @@ namespace NorthwindRestApi.Controllers
             return await _context.Employees.ToListAsync();
         }
 
+        // POST: api/Employees
+        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [HttpPost]
+        public async Task<ActionResult<Employee>> PostEmployee(Employee employee)
+        {
+            if (_context.Employees == null)
+            {
+                return Problem("Entity set 'NorthwindOriginalContext.Employees'  is null.");
+            }
+            _context.Employees.Add(employee);
+            await _context.SaveChangesAsync();
+
+            return CreatedAtAction("GetEmployee", new { id = employee.EmployeeId }, employee);
+        }
+
         // GET: api/Employees/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Employee>> GetEmployee(int id)
@@ -49,6 +64,26 @@ namespace NorthwindRestApi.Controllers
             }
 
             return employee;
+        }
+
+        // DELETE: api/Employees/5
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteEmployee(int id)
+        {
+            if (_context.Employees == null)
+            {
+                return NotFound();
+            }
+            var employee = await _context.Employees.FindAsync(id);
+            if (employee == null)
+            {
+                return NotFound();
+            }
+
+            _context.Employees.Remove(employee);
+            await _context.SaveChangesAsync();
+
+            return NoContent();
         }
 
         // PUT: api/Employees/5
@@ -82,44 +117,33 @@ namespace NorthwindRestApi.Controllers
             return NoContent();
         }
 
-        // POST: api/Employees
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPost]
-        public async Task<ActionResult<Employee>> PostEmployee(Employee employee)
-        {
-          if (_context.Employees == null)
-          {
-              return Problem("Entity set 'NorthwindOriginalContext.Employees'  is null.");
-          }
-            _context.Employees.Add(employee);
-            await _context.SaveChangesAsync();
+     
 
-            return CreatedAtAction("GetEmployee", new { id = employee.EmployeeId }, employee);
-        }
-
-        // DELETE: api/Employees/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteEmployee(int id)
-        {
-            if (_context.Employees == null)
-            {
-                return NotFound();
-            }
-            var employee = await _context.Employees.FindAsync(id);
-            if (employee == null)
-            {
-                return NotFound();
-            }
-
-            _context.Employees.Remove(employee);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
-        }
+        
 
         private bool EmployeeExists(int id)
         {
             return (_context.Employees?.Any(e => e.EmployeeId == id)).GetValueOrDefault();
+        }
+
+        [HttpGet("firstname/{ename}")]
+        public ActionResult GetByName(string ename)
+        {
+            try
+            {
+                var e = _context.Employees.Where(e => e.FirstName.Contains(ename));
+
+                //var prod = from p in _context.Product where p.ProductName.Contains(pname) select p; //<-- sama mutta traditional
+
+
+                // var cust = _context.Customers.Where(c => c.CompanyName == cname);// <--- perfect match
+
+                return Ok(e);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
     }
 }
