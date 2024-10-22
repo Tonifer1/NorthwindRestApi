@@ -15,6 +15,10 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<NorthwindOriginalContext>(options =>
 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 //Azureen julkaistessa käytetään tätä:
+//builder.Configuration.GetConnectionString("Azure")
+//Löytyy appsettings.jsonista
+
+
 
 
 

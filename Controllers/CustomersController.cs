@@ -8,7 +8,8 @@ namespace NorthwindRestApi.Controllers
     [ApiController]
     public class CustomersController : ControllerBase
     {
-        //Alustetaan tietokantayhteys. Perinteinen tapa
+        //Alustetaan tietokantayhteys.
+        //Perinteinen tapa:
         //NorthwindOriginalContext db = new NorthwindOriginalContext(); Voi jättää pois. Pelkkä new riittää perässä.
 
         //Dependency injektion tapa. Alustetaan tyhjänä db.
@@ -75,7 +76,7 @@ namespace NorthwindRestApi.Controllers
         }
 
 
-        //POST = CREATE Lisää uuden asiakkaan. customer on alias nimi Ei parametreja.
+        //POST = CREATE Lisää uuden asiakkaan. customer on alias nimi Ei parametreja.Tämä on poikkeus, jossa anettaan id itse.(5 isoa kirjainta)
         //Tämä ottaa vastaan parametrina http pyynnön body osasta Customer luokkaa vastaavan olion joka on aliasoitu customeriksi.
         [HttpPost]
         public ActionResult AddNewCustomer([FromBody] Customer customer)
@@ -96,6 +97,7 @@ namespace NorthwindRestApi.Controllers
 
 
         //DELETE = DELETE Poistaa yhden asiakkaan id:n perusteella. Huom! string muoto
+        //Northwindissä olevia asiakkaita joilla on tilauksia ei voi poistaa näin. Itse luodut asiakkaat voi poistaa.
         [HttpDelete("{id}")]
         public ActionResult DeleteOneCustomerById(string id)
         {
@@ -103,16 +105,16 @@ namespace NorthwindRestApi.Controllers
             {
                 var asiakas = db.Customers.Find(id);
 
-                if (asiakas == null)
-                {
-                    //return NotFound("Asikasta id:ll" + id + "ei löytynyt");
-                    return NotFound($"Asiakasta id:llä  {id}  ei löytynyt");
-                }
-                else
+                if (asiakas != null)
                 {
                     db.Customers.Remove(asiakas);
                     db.SaveChanges();
-                    return Ok($"Poistettiin {asiakas.CompanyName} poistettu");
+                    return Ok($"Poistettiin {asiakas.CompanyName}");
+                }
+                else
+                {
+                    //return NotFound("Asikasta id:ll" + id + "ei löytynyt");
+                    return NotFound($"Asiakasta id:llä  {id}  ei löytynyt");
                 }
 
             }
@@ -121,54 +123,66 @@ namespace NorthwindRestApi.Controllers
                 //return BadRequest("Tapahtui virhe. Lue lisää: " + e.InnerException);
                 return BadRequest($"Tapahtui virhe. Lue lisää:  + {e.Message}");
             }
-
-
         }
 
+
+        //PUT= UPDATE Päivittää asiakkaan tiedot id:n perusteella.
         //Asiakkaan tietojen muokkaaminen
         //ottaa vastaan kaksi parametria:Urlista id(string) ja customer objekti http bodyn osasta.
         //From body tarkoittaa kaikkia asiakkaan tietoja
-        //Haetaan id:N perusteella vanha asiakasobjekti
-        //PUT= UPDATE Päivittää asiakkaan tiedot id:n perusteella.
-        //Hakee asiakkaan pääavaimella.Tässä tapauksessa string id.
+        //Haetaan id:n perusteella vanha asiakasobjekti        
+        //Hakee asiakkaan pääavaimella.Tässä tapauksessa string id. 5 isoa kirjainta.
+        //var asiakas objektiin on tallennettu ennestään oleva tieto asiakkaasta.customer on parametrina saatu uusi asiakasobjekti.
+        //Lopuksi päivitetään asiakasobjekti eli asiakas ja tallennetaan muutokset tietokantaan.
         [HttpPut("{id}")]
         public ActionResult EditCustomer(string id, [FromBody] Customer customer)
         {
-            var asiakas = db.Customers.Find(id);
-            if (asiakas != null)
+            try
             {
-                //em. asiakasobjektiin sulautetaann parametrina saadut asiakkaan tiedot
-                asiakas.CompanyName = customer.CompanyName;
-                asiakas.ContactName = customer.ContactName;
-                asiakas.Address = customer.Address;
-                asiakas.City = customer.City;
-                asiakas.Region = customer.Region;
-                asiakas.PostalCode = customer.PostalCode;
-                asiakas.Country = customer.Country;
-                asiakas.Phone = customer.Phone;
-                asiakas.Fax = customer.Fax;
-                db.Customers.Update(asiakas); // Päivitä muokattu asiakasobjekti
-                db.SaveChanges();
-                return Ok($"Asiakkaan {asiakas.CompanyName} tiedot päivitetty");
-
+                var asiakas = db.Customers.Find(id);
+                if (asiakas != null)
+                {
+                    //em. asiakasobjektiin sulautetaann parametrina saadut asiakkaan tiedot
+                    asiakas.CompanyName = customer.CompanyName;
+                    asiakas.ContactName = customer.ContactName;
+                    asiakas.Address = customer.Address;
+                    asiakas.City = customer.City;
+                    asiakas.Region = customer.Region;
+                    asiakas.PostalCode = customer.PostalCode;
+                    asiakas.Country = customer.Country;
+                    asiakas.Phone = customer.Phone;
+                    asiakas.Fax = customer.Fax;
+                    db.Customers.Update(asiakas); // Päivitä muokattu asiakasobjekti
+                    db.SaveChanges();
+                    return Ok($"Asiakkaan {asiakas.CompanyName} tiedot päivitetty");
+                }
+                else
+                {
+                    return NotFound($"Asiakasta id:llä {id} ei löytynyt");
+                }
             }
-            return NotFound($"Asiakasta id:llä {id} ei löytynyt");
+            catch (Exception e)
+            {
+                return BadRequest($"Tapahtui virhe. Lue lisää: {e.Message}");
+            }
+
         }
 
-        // Hakee nimen osalla: /api/companyname/hakusana
-        //GET = READ Hakee nimen osalla asiakkaan.
+        //GET = READ Hakee nimen osalla: /api/companyname/hakusana
+        //Tässä tapauksessa {cname} on itse keksitty nimi, joka toimii reittiparametrina.
+        //Se määritellään tässä polussa ja käytetään metodin GetByName parametrina.
         [HttpGet("companyname/{cname}")]
         public ActionResult GetByName(string cname)
         {
             try
             {
+                //Tämä koodi käyttää Entity Frameworkiä (EF) suodattamaan Customers-taulun rivejä, joiden CompanyName-kenttä sisältää merkkijonon cname.
+                //Tämä suodatus tapahtuu tietokannan puolella, koska Where-metodi luo SQL-kyselyn, joka suoritetaan tietokannassa
+                //cname siis sisältää sen merkkijonon, joka on syötetty hakukenttään.
                 var cust = db.Customers.Where(c => c.CompanyName.Contains(cname));
 
-                //var cust = from c in db.Customers where c.CompanyName.Contains(cname) select c; //<-- sama mutta traditional
-
-
-                // var cust = db.Customers.Where(c => c.CompanyName == cname);// <--- perfect match
-
+                //var cust = from c in db.Customers where c.CompanyName.Contains(cname) select c; //<-- sama mutta perinteinen linq kysely.
+                //var cust = db.Customers.Where(c => c.CompanyName == cname);// <--- perfect match
                 return Ok(cust);
             }
             catch (Exception ex)
