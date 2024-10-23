@@ -38,6 +38,45 @@ namespace NorthwindRestApi.Controllers
             return await _context.Products.ToListAsync();
         }
 
+        // Hakee tuotteita hinnan perusteella: /api/products/price/{price}
+        [HttpGet("low/{price}")] // GET-pyyntö, joka hakee tuotteet annetun hinnan perusteella.
+        public ActionResult GetByLowPrice(decimal price)
+        {
+            try
+            {
+                // Haetaan tuotteet, joiden UnitPrice on yhtä suuri tai alle annetun hinnan.
+                var products = _context.Products.Where(p => p.UnitPrice <= price);
+
+                // Palautetaan löydetyt tuotteet.
+                return Ok(products);
+            }
+            catch (Exception ex)
+            {
+                // Jos tapahtuu virhe, palautetaan BadRequest ja virheen viesti.
+                return BadRequest(ex.Message);
+            }
+        }
+
+        // Hakee tuotteita hinnan perusteella: /api/products/price/{price}
+        [HttpGet("high/{price}")] // GET-pyyntö, joka hakee tuotteet annetun hinnan perusteella.
+        public ActionResult GetByHighPrice(decimal price)
+        {
+            try
+            {
+                // Haetaan tuotteet, joiden UnitPrice on yhtä suuri tai yli annetun hinnan.
+                var products = _context.Products.Where(p => p.UnitPrice >= price);
+
+                // Palautetaan löydetyt tuotteet.
+                return Ok(products);
+            }
+            catch (Exception ex)
+            {
+                // Jos tapahtuu virhe, palautetaan BadRequest ja virheen viesti.
+                return BadRequest(ex.Message);
+            }
+        }
+
+
 
         //async tarkoittaa, että metodi on asynkroninen, eli se voi suorittaa operaatioita rinnakkain muiden tehtävien kanssa
         //odottamatta niiden valmistumista heti.

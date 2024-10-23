@@ -11,6 +11,7 @@ namespace NorthwindRestApi.Controllers
         //Alustetaan tietokantayhteys.
         //Perinteinen tapa:
         //NorthwindOriginalContext db = new NorthwindOriginalContext(); Voi jättää pois. Pelkkä new riittää perässä.
+        //db on vastaava kuin _context muissa controllereissa, ja se viittaa Dependency Injectionin kautta tuotuun tietokantakontekstiin.
 
         //Dependency injektion tapa. Alustetaan tyhjänä db.
         private readonly NorthwindOriginalContext db;
@@ -38,11 +39,12 @@ namespace NorthwindRestApi.Controllers
 
         }
 
+        //GET = READ Hakee Id:n perusteella asiakkaan.
+
         //Hakee asiakkaan pääavaimella.{id}
         //Tässä tapauksessa string id,jonka on oltava saman niminen parametrina.kts(string id)
         //koska Northwind tietokannassa asiakkaan pääavain on merkkijono
         //e virheenkäsittelyssä Exeption e = e on oma luotu muuttuja
-        //GET = READ Hakee Id:n perusteella asiakkaan.
         [HttpGet("{id}")]
         public ActionResult GetOneCustomerById(string id)
         {
@@ -74,6 +76,68 @@ namespace NorthwindRestApi.Controllers
 
 
         }
+
+        //GET = READ Hakee nimen osalla: /api/companyname/hakusana
+        //Tässä tapauksessa {cname} on itse keksitty nimi, joka toimii reittiparametrina.
+        //Se määritellään tässä polussa ja käytetään metodin GetByName parametrina.
+        [HttpGet("companyname/{cname}")]
+        public ActionResult GetByName(string cname)
+        {
+            try
+            {
+                //Tämä koodi käyttää Entity Frameworkiä (EF) suodattamaan Customers-taulun rivejä, joiden CompanyName-kenttä sisältää merkkijonon cname.
+                //Tämä suodatus tapahtuu tietokannan puolella, koska Where-metodi luo SQL-kyselyn, joka suoritetaan tietokannassa
+                //cname siis sisältää sen merkkijonon, joka on syötetty hakukenttään.
+                var cust = db.Customers.Where(c => c.CompanyName.Contains(cname));
+
+                //var cust = from c in db.Customers where c.CompanyName.Contains(cname) select c; //<-- sama mutta perinteinen linq kysely.
+                //var cust = db.Customers.Where(c => c.CompanyName == cname);// <--- perfect match
+                return Ok(cust);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        //Hakee asiakkaan yhteyshenkilön nimen perusteella.
+        [HttpGet("contactname/{contname}")]
+        public ActionResult GetByContactName(string contname)
+        {
+            try
+            {
+                var name = db.Customers.Where(c => c.ContactName != null && c.ContactName.Contains(contname));
+                
+                if (string.IsNullOrEmpty(contname))
+                {
+                    return BadRequest("Contact name cannot be null or empty.");
+                }
+
+                return Ok(name);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        //GET = READ Hakee kaupungin nimellä /api/Customers/city/
+        [HttpGet("city/{cityname}")]
+        public ActionResult GetByCity(string cityname)
+        {
+            try
+            {
+                var city = db.Customers.Where(c => c.City == cityname); 
+                //var city = from c in db.Customers where c.City == cityname select c; //<-- sama mutta perinteinen linq kysely.
+                return Ok(city);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+
 
 
         //POST = CREATE Lisää uuden asiakkaan. customer on alias nimi Ei parametreja.Tämä on poikkeus, jossa anettaan id itse.(5 isoa kirjainta)
@@ -127,6 +191,7 @@ namespace NorthwindRestApi.Controllers
 
 
         //PUT= UPDATE Päivittää asiakkaan tiedot id:n perusteella.
+
         //Asiakkaan tietojen muokkaaminen
         //ottaa vastaan kaksi parametria:Urlista id(string) ja customer objekti http bodyn osasta.
         //From body tarkoittaa kaikkia asiakkaan tietoja
@@ -167,30 +232,6 @@ namespace NorthwindRestApi.Controllers
             }
 
         }
-
-        //GET = READ Hakee nimen osalla: /api/companyname/hakusana
-        //Tässä tapauksessa {cname} on itse keksitty nimi, joka toimii reittiparametrina.
-        //Se määritellään tässä polussa ja käytetään metodin GetByName parametrina.
-        [HttpGet("companyname/{cname}")]
-        public ActionResult GetByName(string cname)
-        {
-            try
-            {
-                //Tämä koodi käyttää Entity Frameworkiä (EF) suodattamaan Customers-taulun rivejä, joiden CompanyName-kenttä sisältää merkkijonon cname.
-                //Tämä suodatus tapahtuu tietokannan puolella, koska Where-metodi luo SQL-kyselyn, joka suoritetaan tietokannassa
-                //cname siis sisältää sen merkkijonon, joka on syötetty hakukenttään.
-                var cust = db.Customers.Where(c => c.CompanyName.Contains(cname));
-
-                //var cust = from c in db.Customers where c.CompanyName.Contains(cname) select c; //<-- sama mutta perinteinen linq kysely.
-                //var cust = db.Customers.Where(c => c.CompanyName == cname);// <--- perfect match
-                return Ok(cust);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
-        }
-
 
     }
 
