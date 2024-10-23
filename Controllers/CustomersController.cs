@@ -158,38 +158,6 @@ namespace NorthwindRestApi.Controllers
 
         }
 
-
-
-        //DELETE = DELETE Poistaa yhden asiakkaan id:n perusteella. Huom! string muoto
-        //Northwindissä olevia asiakkaita joilla on tilauksia ei voi poistaa näin. Itse luodut asiakkaat voi poistaa.
-        [HttpDelete("{id}")]
-        public ActionResult DeleteOneCustomerById(string id)
-        {
-            try
-            {
-                var asiakas = db.Customers.Find(id);
-
-                if (asiakas != null)
-                {
-                    db.Customers.Remove(asiakas);
-                    db.SaveChanges();
-                    return Ok($"Poistettiin {asiakas.CompanyName}");
-                }
-                else
-                {
-                    //return NotFound("Asikasta id:ll" + id + "ei löytynyt");
-                    return NotFound($"Asiakasta id:llä  {id}  ei löytynyt");
-                }
-
-            }
-            catch (Exception e)
-            {
-                //return BadRequest("Tapahtui virhe. Lue lisää: " + e.InnerException);
-                return BadRequest($"Tapahtui virhe. Lue lisää:  + {e.Message}");
-            }
-        }
-
-
         //PUT= UPDATE Päivittää asiakkaan tiedot id:n perusteella.
 
         //Asiakkaan tietojen muokkaaminen
@@ -232,6 +200,40 @@ namespace NorthwindRestApi.Controllers
             }
 
         }
+
+
+
+        //DELETE = DELETE Poistaa yhden asiakkaan id:n perusteella. Huom! string muoto
+        //Northwindissä olevia asiakkaita joilla on tilauksia ei voi poistaa näin. Itse luodut asiakkaat voi poistaa.
+        [HttpDelete("{id}")]
+        public ActionResult DeleteOneCustomerById(string id)
+        {
+            try
+            {
+                var asiakas = db.Customers.Find(id);
+
+                if (asiakas != null)
+                {
+                    db.Customers.Remove(asiakas);
+                    db.SaveChanges();
+                    return Ok($"Poistettiin {asiakas.CompanyName}");
+                }
+                else
+                {
+                    //return NotFound("Asikasta id:ll" + id + "ei löytynyt");
+                    return NotFound($"Asiakasta id:llä  {id}  ei löytynyt");
+                }
+
+            }
+            catch (Exception e)
+            {
+                //return BadRequest("Tapahtui virhe. Lue lisää: " + e.InnerException);
+                return BadRequest($"Tapahtui virhe. Lue lisää:  + {e.Message}");
+            }
+        }
+
+
+       
 
     }
 

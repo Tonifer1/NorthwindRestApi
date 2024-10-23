@@ -76,6 +76,25 @@ namespace NorthwindRestApi.Controllers
             }
         }
 
+        // Hakee tuotteita hinnan perusteella: /api/products/price/{price}
+        [HttpGet("{minprice},{maxprice}")] // GET-pyyntö, joka hakee tuotteet annetun hinnan perusteella.
+        public ActionResult GetByPrice(decimal minprice, decimal maxprice)
+        {
+            try
+            {
+                // Haetaan tuotteet, joiden UnitPrice on yhtä suuri tai yli annetun hinnan.
+                var products = _context.Products.Where(p => p.UnitPrice >= minprice && p.UnitPrice <= maxprice);
+
+                // Palautetaan löydetyt tuotteet.
+                return Ok(products);
+            }
+            catch (Exception ex)
+            {
+                // Jos tapahtuu virhe, palautetaan BadRequest ja virheen viesti.
+                return BadRequest(ex.Message);
+            }
+        }
+
 
 
         //async tarkoittaa, että metodi on asynkroninen, eli se voi suorittaa operaatioita rinnakkain muiden tehtävien kanssa

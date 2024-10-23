@@ -33,8 +33,46 @@ namespace NorthwindRestApi.Controllers
             return await _context.Employees.ToListAsync();
         }
 
+        [HttpGet("firstname/{fname}")]
+        public ActionResult GetByName(string fname)
+        {
+            try
+            {
+                var name = _context.Employees.Where(e => e.FirstName.Contains(fname));
+
+                //var prod = from p in _context.Product where p.ProductName.Contains(pname) select p; //<-- sama mutta traditional
+
+
+                // var cust = _context.Customers.Where(c => c.CompanyName == cname);// <--- perfect match
+
+                return Ok(name);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        // GET: api/Employees/5
+        [HttpGet("{id}")]
+        public async Task<ActionResult<Employee>> GetEmployee(int id)
+        {
+            if (_context.Employees == null)
+            {
+                return NotFound();
+            }
+            var employee = await _context.Employees.FindAsync(id);
+
+            if (employee == null)
+            {
+                return NotFound();
+            }
+
+            return employee;
+        }
+
         // POST: api/Employees
-        
+
         [HttpPost]
         public async Task<ActionResult<Employee>> PostEmployee(Employee employee)
         {
@@ -48,46 +86,10 @@ namespace NorthwindRestApi.Controllers
             return CreatedAtAction("GetEmployee", new { id = employee.EmployeeId }, employee);
         }
 
-        // GET: api/Employees/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Employee>> GetEmployee(int id)
-        {
-          if (_context.Employees == null)
-          {
-              return NotFound();
-          }
-            var employee = await _context.Employees.FindAsync(id);
-
-            if (employee == null)
-            {
-                return NotFound();
-            }
-
-            return employee;
-        }
-
-        // DELETE: api/Employees/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteEmployee(int id)
-        {
-            if (_context.Employees == null)
-            {
-                return NotFound();
-            }
-            var employee = await _context.Employees.FindAsync(id);
-            if (employee == null)
-            {
-                return NotFound();
-            }
-
-            _context.Employees.Remove(employee);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
-        }
+       
 
         // PUT: api/Employees/5
-       
+
         [HttpPut("{id}")]
         public async Task<IActionResult> PutEmployee(int id, Employee employee)
         {
@@ -117,6 +119,28 @@ namespace NorthwindRestApi.Controllers
             return NoContent();
         }
 
+        // DELETE: api/Employees/5
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteEmployee(int id)
+        {
+            if (_context.Employees == null)
+            {
+                return NotFound();
+            }
+            var employee = await _context.Employees.FindAsync(id);
+            if (employee == null)
+            {
+                return NotFound();
+            }
+
+            _context.Employees.Remove(employee);
+            await _context.SaveChangesAsync();
+
+            return NoContent();
+        }
+
+       
+
      
 
         
@@ -126,24 +150,6 @@ namespace NorthwindRestApi.Controllers
             return (_context.Employees?.Any(e => e.EmployeeId == id)).GetValueOrDefault();
         }
 
-        [HttpGet("firstname/{ename}")]
-        public ActionResult GetByName(string ename)
-        {
-            try
-            {
-                var e = _context.Employees.Where(e => e.FirstName.Contains(ename));
-
-                //var prod = from p in _context.Product where p.ProductName.Contains(pname) select p; //<-- sama mutta traditional
-
-
-                // var cust = _context.Customers.Where(c => c.CompanyName == cname);// <--- perfect match
-
-                return Ok(e);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
-        }
+        
     }
 }
