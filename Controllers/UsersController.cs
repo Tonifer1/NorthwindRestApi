@@ -20,6 +20,7 @@ namespace NorthwindRestApi.Controllers
             _context = context;
         }
 
+        //Get All
         // GET: api/Users
         [HttpGet]
         public async Task<ActionResult<IEnumerable<User>>> GetUsers()
@@ -35,6 +36,7 @@ namespace NorthwindRestApi.Controllers
                 return await _context.Users.ToListAsync();
         }
 
+        //Get by Id
         // GET: api/Users/5
         [HttpGet("{id}")]
         public async Task<ActionResult<User>> GetUser(int id)
@@ -53,6 +55,7 @@ namespace NorthwindRestApi.Controllers
             return user;
         }
 
+        //Update by Id
         // PUT: api/Users/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
@@ -84,6 +87,7 @@ namespace NorthwindRestApi.Controllers
             return NoContent();
         }
 
+        //Create
         // POST: api/Users
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
@@ -99,6 +103,7 @@ namespace NorthwindRestApi.Controllers
             return CreatedAtAction("GetUser", new { id = user.UserId }, user);
         }
 
+        //Delete by Id
         // DELETE: api/Users/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteUser(int id)
