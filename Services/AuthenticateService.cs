@@ -44,7 +44,9 @@ namespace NorthwindRestApi.Services
                 {
                     new Claim(ClaimTypes.Name, foundUser.UserId.ToString()),
                     new Claim(ClaimTypes.Role, "Admin"),
-                    new Claim(ClaimTypes.Version, "V3.1")
+                    new Claim(ClaimTypes.Version, "V3.1"),
+                    new Claim("acceslevelId", foundUser.AcceslevelId.ToString())
+
                 }),
                 Expires = DateTime.UtcNow.AddHours(2), // Montako päivää token on voimassa
 

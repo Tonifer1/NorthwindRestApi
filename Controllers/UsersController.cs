@@ -8,10 +8,11 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using NorthwindRestApi.Models;
+using NuGet.Protocol.Plugins;
 
 namespace NorthwindRestApi.Controllers
 {
-    //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     [Route("api/[controller]")]
     [ApiController]
     public class UsersController : ControllerBase
@@ -28,15 +29,32 @@ namespace NorthwindRestApi.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<User>>> GetUsers()
         {
-          if (_context.Users == null)
+            Console.WriteLine("GetUsers method called.");
+            if (_context.Users == null)
           {
               return NotFound();
           }
-            foreach (var user in _context.Users)
+            var accesLevelIdClaim = User.Claims.FirstOrDefault(c => c.Type == "acceslevelId")?.Value;
+            int accesLevelId;
+            Console.WriteLine($"Claims: {string.Join(", ", User.Claims.Select(c => $"{c.Type}={c.Value}"))}");
+            Console.WriteLine($"accesLevelIdClaim: {accesLevelIdClaim}");
+
+            if (int.TryParse(accesLevelIdClaim, out accesLevelId) && accesLevelId == 2)
             {
-                user.Password = null;
-            }
+                // Käyttäjä on tasolla 2
+                foreach (var user in _context.Users)
+                {
+                    user.Password = null;
+                }
                 return await _context.Users.ToListAsync();
+
+            }
+            else
+            {
+                return Unauthorized("Access denied: Only level 2 users are allowed.");
+            }
+        
+
         }
 
         //Get by Id
