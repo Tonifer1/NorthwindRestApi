@@ -24,6 +24,7 @@ namespace NorthwindRestApi.Controllers
             _context = context;
         }
 
+        //if (_context.Users == null) varmistaa, että sovelluksella on pääsy Users-tauluun NorthwindOriginalContext-kontekstin kautta
         //Get All
         // GET: api/Users
         [HttpGet]
@@ -31,9 +32,9 @@ namespace NorthwindRestApi.Controllers
         {
             Console.WriteLine("GetUsers method called.");
             if (_context.Users == null)
-          {
+            {
               return NotFound();
-          }
+            }
             var accesLevelIdClaim = User.Claims.FirstOrDefault(c => c.Type == "acceslevelId")?.Value;
             int accesLevelId;
             Console.WriteLine($"Claims: {string.Join(", ", User.Claims.Select(c => $"{c.Type}={c.Value}"))}");
@@ -62,10 +63,17 @@ namespace NorthwindRestApi.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<User>> GetUser(int id)
         {
-          if (_context.Users == null)
-          {
+            var accesLevelIdClaim = User.Claims.FirstOrDefault(c => c.Type == "acceslevelId")?.Value;
+            int accesLevelId;
+            if (!(int.TryParse(accesLevelIdClaim, out accesLevelId) && accesLevelId == 2))
+            {
+                return Unauthorized("Access denied: Only level 2 users are allowed.");
+            }
+
+            if (_context.Users == null)
+            {
               return NotFound();
-          }
+            }
             var user = await _context.Users.FindAsync(id);
 
             if (user == null)
@@ -78,10 +86,25 @@ namespace NorthwindRestApi.Controllers
 
         //Update by Id
         // PUT: api/Users/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        //Apumuuttujaa UserExists käytetään:
+        //Tietokannan eheyden takaamiseksi, jotta ei tehdä muutoksia olemattomaan tietueeseen.
+        //Concurrency-tilanteiden hallitsemiseksi, koska päivitysoperaatiossa on mahdollista, että tietuetta muokataan samanaikaisesti.
+
+        private bool UserExists(int id)
+        {
+            return _context.Users?.Any(e => e.UserId == id) ?? false;
+        }
+
         [HttpPut("{id}")]
         public async Task<IActionResult> PutUser(int id, User user)
         {
+            var accesLevelIdClaim = User.Claims.FirstOrDefault(c => c.Type == "acceslevelId")?.Value;
+            int accesLevelId;
+            if (!(int.TryParse(accesLevelIdClaim, out accesLevelId) && accesLevelId == 2))
+            {
+                return Unauthorized("Access denied: Only level 2 users are allowed.");
+            }
+
             if (id != user.UserId)
             {
                 return BadRequest();
@@ -106,7 +129,10 @@ namespace NorthwindRestApi.Controllers
             }
 
             return NoContent();
+
+
         }
+
 
         //Create
         // POST: api/Users
@@ -114,10 +140,17 @@ namespace NorthwindRestApi.Controllers
         [HttpPost]
         public async Task<ActionResult<User>> PostUser(User user)
         {
-          if (_context.Users == null)
-          {
-              return Problem("Entity set 'NorthwindOriginalContext.Users'  is null.");
-          }
+            var accesLevelIdClaim = User.Claims.FirstOrDefault(c => c.Type == "acceslevelId")?.Value;
+            int accesLevelId;
+            if (!(int.TryParse(accesLevelIdClaim, out accesLevelId) && accesLevelId == 2))
+            {
+                return Unauthorized("Access denied: Only level 2 users are allowed.");
+            }
+
+            if (_context.Users == null)
+            {
+                return Problem("Entity set 'NorthwindOriginalContext.Users' is null.");
+            }
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
 
@@ -129,6 +162,13 @@ namespace NorthwindRestApi.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteUser(int id)
         {
+            var accesLevelIdClaim = User.Claims.FirstOrDefault(c => c.Type == "acceslevelId")?.Value;
+            int accesLevelId;
+            if (!(int.TryParse(accesLevelIdClaim, out accesLevelId) && accesLevelId == 2))
+            {
+                return Unauthorized("Access denied: Only level 2 users are allowed.");
+            }
+
             if (_context.Users == null)
             {
                 return NotFound();
@@ -143,11 +183,6 @@ namespace NorthwindRestApi.Controllers
             await _context.SaveChangesAsync();
 
             return NoContent();
-        }
-
-        private bool UserExists(int id)
-        {
-            return (_context.Users?.Any(e => e.UserId == id)).GetValueOrDefault();
         }
     }
 }
