@@ -27,8 +27,8 @@ builder.Services.AddSwaggerGen();
 
 //Dependency injectionilla välitetty Local tietokantayhteys controllereille
 
-builder.Services.AddDbContext<NorthwindOriginalContext>(options =>
-options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+//builder.Services.AddDbContext<NorthwindOriginalContext>(options =>
+//options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 
 
@@ -44,9 +44,9 @@ builder.Services.AddCors(options =>
 
 // ------Azure Connection string luetaan app settings.json tiedostosta--------------
 
-//builder.Services.AddDbContext<NorthwindOriginalContext>(options => options.UseSqlServer(
-//    builder.Configuration.GetConnectionString("Azure")
-//    ));
+builder.Services.AddDbContext<NorthwindOriginalContext>(options => options.UseSqlServer(
+    builder.Configuration.GetConnectionString("Azure")
+    ));
 
 
 

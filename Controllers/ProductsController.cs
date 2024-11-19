@@ -12,7 +12,7 @@ using NorthwindRestApi.Models;
 namespace NorthwindRestApi.Controllers
 {
     // Määrittää reitin tämän API:n kutsuille, esimerkiksi "api/products"
-    //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     [Route("api/[controller]")]
     [ApiController]
     public class ProductsController : ControllerBase
@@ -118,6 +118,7 @@ namespace NorthwindRestApi.Controllers
             {
                 return Problem("Entity set 'NorthwindOriginalContext.Products' is null.");
             }
+
             // Lisätään uusi tuote tietokantaan.
             _context.Products.Add(product);
             // Tallennetaan muutokset tietokantaan.
