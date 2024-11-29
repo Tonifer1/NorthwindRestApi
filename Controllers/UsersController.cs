@@ -24,9 +24,30 @@ namespace NorthwindRestApi.Controllers
             _context = context;
         }
 
-        //if (_context.Users == null) varmistaa, että sovelluksella on pääsy Users-tauluun NorthwindOriginalContext-kontekstin kautta
         //Get All
         // GET: api/Users
+        // IEnumerable<User> tarkoittaa, että palautetaan kokoelma User-objekteja.
+        //if (_context.Users == null) varmistaa, että sovelluksella on pääsy Users-tauluun NorthwindOriginalContext-kontekstin kautta
+        //ActionResult<IEnumerable<User>>: Metodi palauttaa ActionResult-tyypin,joka mahdollistaa HTTP-vastauksen hallinnan.
+
+        //User.Claims on lista käyttäjän claims-tiedoista. Claim on yksittäinen väite (esimerkiksi tunnistautuminen tai rooli), joka liittyy käyttäjään.
+        //FirstOrDefault hakee ensimmäisen claimin, joka vastaa ehtoa Type == "acceslevelId" (eli käyttäjän accesslevelId).
+        //?.Value: Tämä tarkoittaa, että jos kyseinen claim löytyy, sen Value (arvo) otetaan. Jos claim ei löydy, palautetaan null.
+        //int.TryParse yrittää muuntaa accesLevelIdClaim-arvon kokonaisluvuksi (int).
+        //Jos accesLevelIdClaim on kelvollinen kokonaisluku ja se on 2, jatketaan suorittamista.
+        //Jos accesLevelIdClaim Ei ole kelvollinen luku, tai se ei ole 2, päädytään else-osioon
+        //Jos käyttäjä on tasolla 2, käydään läpi kaikki käyttäjät tietokannasta ja asetetaan heidän Password-kenttänsä null-arvoksi,
+        //jotta salasana ei paljastu.
+        //return await _context.Users.ToListAsync(): Palautetaan kaikkien käyttäjien lista tietokannasta (lukuoperaatio) asynkronisesti.
+
+        //var accesLevelIdClaim = User.Claims.FirstOrDefault(c => c.Type == "acceslevelId")?.Value;
+        //Tämä rivi hakee User.Claims-kokoelmasta claimin, jonka Type on "acceslevelId".
+        //Jos tällaista claimia ei löydy, palautetaan null
+        //?.Value palauttaa itse claimin arvon string-muodossa, jos claim löytyy. Muuten palautetaan null.
+        //int accesLevelId; Tämä on muuttuja, johon yritetään muuntaa accesLevelIdClaim-arvo kokonaisluvuksi.
+
+
+
         [HttpGet]
         public async Task<ActionResult<IEnumerable<User>>> GetUsers()
         {
@@ -35,10 +56,9 @@ namespace NorthwindRestApi.Controllers
             {
               return NotFound();
             }
+
             var accesLevelIdClaim = User.Claims.FirstOrDefault(c => c.Type == "acceslevelId")?.Value;
             int accesLevelId;
-            Console.WriteLine($"Claims: {string.Join(", ", User.Claims.Select(c => $"{c.Type}={c.Value}"))}");
-            Console.WriteLine($"accesLevelIdClaim: {accesLevelIdClaim}");
 
             if (int.TryParse(accesLevelIdClaim, out accesLevelId) && accesLevelId == 2)
             {
